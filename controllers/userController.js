@@ -220,7 +220,7 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `https://fstecom.netlify.app/reset-password/${resetToken}`;
 
     const message = `
       <h2>Password Reset</h2>

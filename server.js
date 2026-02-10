@@ -17,18 +17,16 @@ const port = process.env.PORT || 5000;
 
 // app.use(
 //   cors({
-//     origin: "https://fsstecom.netlify.app/", // 🔥 sabse important
+//     origin: "https://fsstecom.netlify.app/",
 //     credentials: true,
 //   }),
 // );
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://fsstecom.netlify.app"],
+    origin: ["http://localhost:5173", "https://fstecom.netlify.app"],
     credentials: true,
   }),
 );
-
-// app.options("*", cors());
 
 app.use(express.json());
 app.use(
