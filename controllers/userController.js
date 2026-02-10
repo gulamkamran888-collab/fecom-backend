@@ -54,16 +54,6 @@ export const createUser = async (req, res) => {
       // secure: false,
     });
 
-    // res.cookie("refreshtoken", refreshtoken, {
-    //   httpOnly: true,
-    //   path: "/user/refreshtoken",
-    //   // sameSite: "lax",
-    //   // secure: false,
-    //   // secure: process.env.NODE_ENV === "production",
-    //   // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    //   secure: true,
-    //   sameSite: "none",
-    // });
     return res.json({ accesstoken });
   } catch (error) {
     return res.status(500).json({
@@ -136,10 +126,6 @@ export const login = async (req, res) => {
       path: "/user/refreshtoken",
       secure: true,
       sameSite: "none",
-      // sameSite: "lax",
-      // secure: false,
-      // secure: process.env.NODE_ENV === "production",
-      // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
     res.json({
       accesstoken,
