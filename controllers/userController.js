@@ -124,6 +124,7 @@ export const login = async (req, res) => {
     res.cookie("refreshtoken", refreshtoken, {
       httpOnly: true,
       path: "/user/refreshtoken",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
       sameSite: "none",
     });
