@@ -3,7 +3,9 @@ import userModel from "../models/userSchema.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { cart } = req.body;
+    // const { cart } = req.body;
+    const { cart, shippingAddress, paymentMethod } = req.body;
+
     console.log("REQ.USER 👉", req.user);
 
     const user = await userModel.findById(req.user);
@@ -14,10 +16,18 @@ export const createOrder = async (req, res) => {
     // total calculate
     const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
+    // const newOrder = new orderModel({
+    //   user: req.user,
+    //   cart,
+    //   total,
+    // });
     const newOrder = new orderModel({
       user: req.user,
       cart,
       total,
+      shippingAddress,
+      paymentMethod,
+      paymentStatus: paymentMethod === "COD" ? "Pending" : "Paid",
     });
 
     await newOrder.save();
@@ -64,3 +74,6 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+

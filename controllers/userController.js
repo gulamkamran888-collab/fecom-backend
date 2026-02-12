@@ -267,3 +267,38 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+export const addAddress = async (req, res) => {
+  try {
+    console.log(req.body, "no body");
+
+    const user = await userModel.findById(req.user);
+    if (!user) return res.status(400).json({ msg: "User not found" });
+
+    const { fullName, mobile, pincode, addressLine, city, state, landmark } =
+      req.body;
+
+    if (!fullName || !mobile || !pincode || !addressLine || !city || !state) {
+      return res.status(400).json({ msg: "Please fill all required fields" });
+    }
+
+    user.addresses.push({
+      fullName,
+      mobile,
+      pincode,
+      addressLine,
+      city,
+      state,
+      landmark,
+    });
+
+    await user.save();
+
+    res.json({
+      msg: "Address added successfully",
+      addresses: user.addresses,
+    });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};

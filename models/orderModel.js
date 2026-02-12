@@ -30,6 +30,23 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "RAZORPAY"],
+    },
+    paymentStatus: {
+      type: String,
+      default: "Pending",
+    },
+    shippingAddress: {
+      fullName: String,
+      mobile: String,
+      pincode: String,
+      addressLine: String,
+      city: String,
+      state: String,
+      landmark: String,
+    },
     status: {
       type: String,
       default: "Pending",
@@ -37,5 +54,5 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-const orderModel=mongoose.model("Orders", orderSchema);
-export default orderModel
+const orderModel = mongoose.model("Orders", orderSchema);
+export default orderModel;

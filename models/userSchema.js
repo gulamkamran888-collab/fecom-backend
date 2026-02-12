@@ -9,6 +9,17 @@ const userSchema = new mongoose.Schema(
     cart: { type: Array, default: [] },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    addresses: [
+      {
+        fullName: String,
+        mobile: String,
+        pincode: String,
+        addressLine: String,
+        city: String,
+        state: String,
+        landmark: String,
+      },
+    ],
   },
   { timestamps: true },
 );

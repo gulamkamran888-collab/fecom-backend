@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addAddress,
   addCart,
   createUser,
   forgotPassword,
@@ -22,5 +23,6 @@ userRouter.patch("/addcart", auth, addCart);
 userRouter.put("/profile", auth, updateProfile);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.put("/reset-password/:token", resetPassword);
+userRouter.patch("/addaddress", auth, addAddress);
 
 export default userRouter;
