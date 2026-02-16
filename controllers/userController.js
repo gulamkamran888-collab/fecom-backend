@@ -25,13 +25,22 @@ export const createUser = async (req, res) => {
       });
     }
 
-    // password validation
-    if (password.length < 6) {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+
+    if (!passwordRegex.test(password)) {
       return res.status(400).json({
-        success: false,
-        msg: "Password must be at least 6 characters",
+        msg: "Password must contain uppercase, lowercase, number and special character",
       });
     }
+
+    // password validation
+    // if (password.length < 6) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     msg: "Password must be at least 6 characters",
+    //   });
+    // }
 
     // password encryption
 
@@ -53,8 +62,9 @@ export const createUser = async (req, res) => {
       // sameSite: "lax",
       // secure: false,
     });
+    res.status(201).json({ msg: "User registered successfully" });
 
-    return res.json({ accesstoken });
+    return res.json({ msg: "User registered successfully", accesstoken });
   } catch (error) {
     return res.status(500).json({
       success: false,
