@@ -21,25 +21,35 @@
 
 // export default sendEmail;
 
-import nodemailer from "nodemailer";
+import fetch from "node-fetch";
 
 const sendEmail = async (options) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_LOGIN,
-      pass: process.env.SMTP_PASSWORD,
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": process.env.SMTP_PASSWORD,
     },
+    body: JSON.stringify({
+      sender: {
+        name: "Fcom Support",
+        email: "fsstecom@gmail.com",
+      },
+      to: [
+        {
+          email: options.email,
+        },
+      ],
+      subject: options.subject,
+      htmlContent: options.message,
+    }),
   });
 
-  await transporter.sendMail({
-    from: `"Fcom Support" <${process.env.SMTP_LOGIN}>`,
-    to: options.email,
-    subject: options.subject,
-    html: options.message,
-  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Email failed");
+  }
 };
 
 export default sendEmail;
