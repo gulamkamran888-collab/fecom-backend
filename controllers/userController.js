@@ -51,8 +51,8 @@ export const createUser = async (req, res) => {
     await newUser.save();
 
     // create
-    const accesstoken = createAccessToken(newUser._id);
-    const refreshtoken = createRefreshToken(newUser._id);
+    const accesstoken = createAccessToken({ id: newUser._id });
+    const refreshtoken = createRefreshToken({ id: newUser._id });
 
     res.cookie("refreshtoken", refreshtoken, {
       httpOnly: true,
@@ -68,12 +68,19 @@ export const createUser = async (req, res) => {
       accesstoken,
     });
   } catch (error) {
+    console.log("REGISTER ERROR 👉", error);
     return res.status(500).json({
       success: false,
-      msg: "Error while creating user",
-      error: error.message,
+      msg: error.message,
     });
   }
+  // catch (error) {
+  //   return res.status(500).json({
+  //     success: false,
+  //     msg: "Error while creating user",
+  //     error: error.message,
+  //   });
+  // }
 };
 export const refreshtoken = async (req, res) => {
   try {
