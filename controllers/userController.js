@@ -62,9 +62,11 @@ export const createUser = async (req, res) => {
       // sameSite: "lax",
       // secure: false,
     });
-    res.status(201).json({ msg: "User registered successfully" });
-
-    return res.json({ msg: "User registered successfully", accesstoken });
+    return res.status(201).json({
+      success: true,
+      msg: "User registered successfully",
+      accesstoken,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
