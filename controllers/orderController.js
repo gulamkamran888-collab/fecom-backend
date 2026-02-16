@@ -75,5 +75,36 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+export const cancleOrder = async (req, res) => {
+  try {
+    const order = await orderModel.findById(req.params.id);
 
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
+    if (order.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ message: "Only pending orders can be cancelled" });
+    }
+
+    order.status = "Cancelled";
+    order.deliveryStatus = "Cancelled";
+    await order.save();
+
+    res.json({ message: "Order cancelled successfully", order });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET: Single Order Details
+export const singleOrder = async (req, res) => {
+  try {
+    const order = await orderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

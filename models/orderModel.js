@@ -47,9 +47,19 @@ const orderSchema = new mongoose.Schema(
       state: String,
       landmark: String,
     },
+    deliveryStatus: {
+      type: String,
+      enum: ["Processing", "Shipped", "Delivered"],
+      default: "Processing",
+    },
     status: {
       type: String,
+      enum: ["Pending", "Cancelled", "Completed"],
       default: "Pending",
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true },

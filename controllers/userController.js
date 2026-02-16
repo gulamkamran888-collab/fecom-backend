@@ -204,6 +204,47 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+// export const forgotPassword = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+//     console.log(req.body);
+
+//     const user = await userModel.findOne({ email });
+//     if (!user) return res.status(400).json({ msg: "User not found" });
+
+//     const resetToken = crypto.randomBytes(32).toString("hex");
+
+//     user.resetPasswordToken = crypto
+//       .createHash("sha256")
+//       // .update(resetToken)
+//       .update(req.params.token)
+//       .digest("hex");
+
+//     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+//     await user.save();
+
+//     // const resetUrl = `https://fstecom.netlify.app/reset-password/${resetToken}`;
+//     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+//     const message = `
+//       <h2>Password Reset</h2>
+//       <p>You requested password reset</p>
+//       <a href="${resetUrl}">Reset Password</a>
+//       <p>This link will expire in 15 minutes</p>
+//     `;
+
+//     await sendEmail({
+//       email: user.email,
+//       subject: "Password Reset Request",
+//       message,
+//     });
+
+//     res.json({ msg: "Reset password link sent to email" });
+//   } catch (err) {
+//     res.status(500).json({ msg: err.message });
+//   }
+// };
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -221,13 +262,43 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    const resetUrl = `https://fstecom.netlify.app/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
+    // 🔥 PROFESSIONAL EMAIL TEMPLATE HERE
     const message = `
-      <h2>Password Reset</h2>
-      <p>You requested password reset</p>
-      <a href="${resetUrl}">Reset Password</a>
-      <p>This link will expire in 15 minutes</p>
+      <div style="font-family: Arial, sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #eee;">
+        <h2 style="color:#333;">Password Reset Request</h2>
+
+        <p>Hello ${user.name || "User"},</p>
+
+        <p>You requested to reset your password. Click the button below:</p>
+
+        <div style="text-align:center; margin:30px 0;">
+          <a href="${resetUrl}" 
+             style="
+               background-color:#1976d2;
+               color:white;
+               padding:12px 25px;
+               text-decoration:none;
+               border-radius:5px;
+               display:inline-block;
+               font-weight:bold;
+             ">
+             Reset Password
+          </a>
+        </div>
+
+        <p>This link will expire in <strong>15 minutes</strong>.</p>
+
+        <p>If you did not request this, please ignore this email.</p>
+
+        <hr />
+        <p style="font-size:12px;color:#777;">
+          If the button doesn't work, copy and paste this link in your browser:
+          <br />
+          ${resetUrl}
+        </p>
+      </div>
     `;
 
     await sendEmail({
@@ -244,6 +315,13 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
+    const password = req.body.password;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        msg: "Password must be at least 6 characters",
+      });
+    }
     const resetToken = crypto
       .createHash("sha256")
       .update(req.params.token)
