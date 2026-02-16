@@ -68,19 +68,12 @@ export const createUser = async (req, res) => {
       accesstoken,
     });
   } catch (error) {
-    console.log("REGISTER ERROR 👉", error);
     return res.status(500).json({
       success: false,
-      msg: error.message,
+      msg: "Error while creating user",
+      error: error.message,
     });
   }
-  // catch (error) {
-  //   return res.status(500).json({
-  //     success: false,
-  //     msg: "Error while creating user",
-  //     error: error.message,
-  //   });
-  // }
 };
 export const refreshtoken = async (req, res) => {
   try {
@@ -327,8 +320,16 @@ export const forgotPassword = async (req, res) => {
     });
 
     res.json({ msg: "Reset password link sent to email" });
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
+  } catch (error) {
+    // catch (err) {
+    //   res.status(500).json({ msg: err.message });
+    // }
+    console.log("FORGOT ERROR 👉", error);
+    return res.status(500).json({
+      success: false,
+      msg: error.message, // 👈 important
+      stack: error.stack, // temporary debugging
+    });
   }
 };
 
