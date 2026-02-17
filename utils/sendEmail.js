@@ -28,7 +28,7 @@ const sendEmail = async (options) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "api-key": process.env.SMTP_PASSWORD,
+      "api-key": process.env.SMTP_API,
     },
     body: JSON.stringify({
       sender: {
