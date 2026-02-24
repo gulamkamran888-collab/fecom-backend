@@ -57,7 +57,7 @@
 // };
 const paginationQuery = (query, queryString) => {
   const page = queryString.page * 1 || 1;
-  const limit = Math.min(queryString.limit * 1 || 9);
+  const limit = Math.min(queryString.limit * 1 || 12);
   const skip = (page - 1) * limit;
 
   return query.skip(skip).limit(limit);
