@@ -34,16 +34,6 @@ export const createUser = async (req, res) => {
       });
     }
 
-    // password validation
-    // if (password.length < 6) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     msg: "Password must be at least 6 characters",
-    //   });
-    // }
-
-    // password encryption
-
     const hashPassword = await hash(password, 10);
 
     // create user
@@ -118,17 +108,86 @@ export const getUser = async (req, res) => {
   }
 };
 
+// export const login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await userModel.findOne({ email });
+//     console.log(user);
+
+//     if (!user) return res.status(400).json({ msg: "user does not exist" });
+
+//     const isMatch = await compare(password, user.password);
+//     if (!isMatch) return res.status(400).json({ msg: "incomplete password" });
+
+//     const accesstoken = createAccessToken({ id: user._id });
+//     const refreshtoken = createRefreshToken({ id: user._id });
+
+//     res.cookie("refreshtoken", refreshtoken, {
+//       httpOnly: true,
+//       path: "/user/refreshtoken",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//       secure: true,
+//       sameSite: "none",
+//     });
+//     res.json({
+//       accesstoken,
+//       user: {
+//         role: user.role,
+//       },
+//     });
+//     console.log(accesstoken);
+//   } catch (err) {
+//     return res.status(500).json({ msg: err.message });
+//   }
+// };
+
+const MAX_ATTEMPTS = 5;
+const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userModel.findOne({ email });
-    console.log(user);
+    if (!email || !password) {
+      return res.status(400).json({ msg: "All fields are required" });
+    }
 
-    if (!user) return res.status(400).json({ msg: "user does not exist" });
+    const user = await userModel.findOne({ email });
+
+    // if (!user) {
+    //   return res.status(400).json({ msg: "User does not exist" });
+    // }
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid email or password" });
+    }
+
+    // ✅ Check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res.status(400).json({
+        msg: "Account locked. Try again after 15 minutes.",
+      });
+    }
 
     const isMatch = await compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "incomplete password" });
+
+    // ❌ If password incorrect
+    if (!isMatch) {
+      user.loginAttempts += 1;
+
+      if (user.loginAttempts >= MAX_ATTEMPTS) {
+        user.lockUntil = Date.now() + LOCK_TIME;
+      }
+
+      await user.save();
+
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // ✅ Reset attempts on successful login
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
+    await user.save();
 
     const accesstoken = createAccessToken({ id: user._id });
     const refreshtoken = createRefreshToken({ id: user._id });
@@ -140,13 +199,13 @@ export const login = async (req, res) => {
       secure: true,
       sameSite: "none",
     });
+
     res.json({
       accesstoken,
       user: {
         role: user.role,
       },
     });
-    console.log(accesstoken);
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
